@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Promtail Auto-install Script
+echo "🚀 Starting Promtail installation..."
+
+# Fetch the hostname of the system
+HOSTNAME=$(hostname)
+
+# Download Promtail binary
+wget https://github.com/grafana/loki/releases/download/v2.4.1/promtail-linux-amd64.zip -O promtail.zip
+
+# Unzip and move to /usr/local/bin
+unzip promtail.zip
+chmod a+x promtail-linux-amd64
+mv promtail-linux-amd64 /usr/local/bin/promtail
+
+# Create system user and group
+sudo addgroup --system promtail
+sudo adduser --system --ingroup promtail promtail
+
+# Create config directory and file
+mkdir -p /etc/promtail
+cat <<EOL > /etc/promtail/promtail-config.yaml
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://127.0.0.1:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: journal
+    journal:
+      max_age: 12h
+      labels:
+        job: systemd-journal
+        host: $HOSTNAME
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+EOL
+
+# Adjust ownership
+chown -R promtail:promtail /etc/promtail
+
+# Create systemd service
+cat <<EOL > /etc/systemd/system/promtail.service
+[Unit]
+Description=Promtail service
+After=network.target
+
+[Service]
+User=promtail
+Group=promtail
+ExecStart=/usr/local/bin/promtail -config.file /etc/promtail/promtail.yml
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+# Reload Systemd, enable and start service
+systemctl daemon-reload
+systemctl enable promtail
+systemctl start promtail
+systemctl restart promtail
+journalctl -fu promtail
+
+echo "🎉 Promtail installation complete!"
+
