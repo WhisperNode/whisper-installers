@@ -1,9 +1,15 @@
 #!/bin/bash
 
-# Promtail Auto-install Script
 echo "🚀 Starting Promtail installation..."
 
-# Fetch the hostname of the system
+# Check and install unzip if not exists
+if ! command -v unzip &> /dev/null; then
+  echo "🛠 Installing unzip..."
+  sudo apt update
+  sudo apt install -y unzip
+fi
+
+# Fetch system hostname
 HOSTNAME=$(hostname)
 
 # Download Promtail binary
@@ -12,13 +18,13 @@ wget https://github.com/grafana/loki/releases/download/v2.4.1/promtail-linux-amd
 # Unzip and move to /usr/local/bin
 unzip promtail.zip
 chmod a+x promtail-linux-amd64
-mv promtail-linux-amd64 /usr/local/bin/promtail
+sudo mv promtail-linux-amd64 /usr/local/bin/promtail
 
 # Create system user and group
 sudo addgroup --system promtail
 sudo adduser --system --ingroup promtail promtail
 
-# Create config directory and file
+# Create config file
 mkdir -p /etc/promtail
 cat <<EOL > /etc/promtail/promtail-config.yaml
 server:
@@ -43,8 +49,8 @@ scrape_configs:
         target_label: 'unit'
 EOL
 
-# Adjust ownership
-chown -R promtail:promtail /etc/promtail
+# Adjust permissions
+sudo chown -R promtail:promtail /etc/promtail
 
 # Create systemd service
 cat <<EOL > /etc/systemd/system/promtail.service
@@ -55,18 +61,17 @@ After=network.target
 [Service]
 User=promtail
 Group=promtail
-ExecStart=/usr/local/bin/promtail -config.file /etc/promtail/promtail.yml
+ExecStart=/usr/local/bin/promtail -config.file /etc/promtail/promtail-config.yaml
 
 [Install]
 WantedBy=multi-user.target
 EOL
 
-# Reload Systemd, enable and start service
-systemctl daemon-reload
-systemctl enable promtail
-systemctl start promtail
-systemctl restart promtail
-journalctl -fu promtail
+# Reload systemd and start Promtail service
+sudo systemctl daemon-reload
+sudo systemctl enable promtail
+sudo systemctl start promtail
 
 echo "🎉 Promtail installation complete!"
+
 
