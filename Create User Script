@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <username>"
+    exit 1
+fi
+
+username=$1
+
+# Create the user with a password
+adduser "$username"
+
+# Set a password for the new user (replace 'your_password_here' with the actual password)
+echo "$username:your_password_here" | chpasswd
+
+# Change the SSH port (replace 'your_new_ssh_port' with the desired port number)
+sed -i 's/#Port 22/Port your_new_ssh_port/' /etc/ssh/sshd_config
+
+# Restart the SSH service to apply the changes
+service ssh restart
+
+# Give user sudo access
+usermod -aG adm "$username"
+usermod -aG systemd-journal "$username"
+usermod -aG sudo "$username"
+
+echo "Password-based login is enabled for $username on SSH port your_new_ssh_port."
