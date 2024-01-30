@@ -24,6 +24,11 @@ NAMADA_TAG="v0.30.3"
 NAMADA_CHAIN_ID="<INSERT CHAIN-ID"
 rm -rf $HOME/.masp-params
 
+if [ ! $USER ]; then
+	read -p "Enter User: " USER
+	echo 'export USER='\"${USER}\" >> $HOME/.bash_profile
+fi
+
 if [ ! $VALIDATOR_ALIAS ]; then
 	read -p "Enter validator name: " VALIDATOR_ALIAS
 	echo 'export VALIDATOR_ALIAS='\"${VALIDATOR_ALIAS}\" >> $HOME/.bash_profile
