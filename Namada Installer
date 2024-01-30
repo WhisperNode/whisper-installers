@@ -19,9 +19,9 @@ if ss -tulpen | awk '{print $5}' | grep -q ":26656$" ; then
 else
         echo ""
 fi
-NAMADA_TAG="v0.28.2"
+NAMADA_TAG="v0.30.3"
 #TM_HASH="v0.1.4-abciplus"
-NAMADA_CHAIN_ID="public-testnet-15.0dacadb8d663"
+NAMADA_CHAIN_ID="<INSERT CHAIN-ID"
 rm -rf $HOME/.masp-params
 
 if [ ! $VALIDATOR_ALIAS ]; then
@@ -32,10 +32,6 @@ if [ ! $EMAIL ]; then
         read -p "Enter your email address: " EMAIL
         echo 'export EMAIL='\"${EMAIL}\" >> $HOME/.bash_profile
 fi
-echo -e 'Setting up swapfile...\n'
-curl -s https://api.nodes.guru/swap8.sh | bash
-echo 'source $HOME/.bashrc' >> $HOME/.bash_profile
-. $HOME/.bash_profile
 sleep 1
 cd $HOME
 sudo apt update
@@ -103,23 +99,21 @@ cd $HOME
 namada client utils join-network --chain-id $NAMADA_CHAIN_ID
 sleep 3
 echo "[Unit]
-Description=Namada Node
-After=network.target
-
+Description=namada
+After=network-online.target
 [Service]
 User=$USER
-WorkingDirectory=$HOME/.local/share/namada
-Type=simple
-ExecStart=/usr/local/bin/namadan ledger run
-Environment=NAMADA_LOG=info
-Environment=NAMADA_CMT_STDOUT=true
+WorkingDirectory=/home/$USER/.cargo/bin
 Environment=CMT_LOG_LEVEL=p2p:none,pex:error
-LimitSTACK=unlimited
-RemainAfterExit=no
+Environment=NAMADA_CMT_STDOUT=true
+ExecStart=/home/whispernode/.cargo/bin/namada node ledger run
+ExecStartPre=-/usr/bin/rm -rf /home/$USER/.local/share/namada/<InSERT CHAIN-ID>/tx_wasm_cache /home/$USER/.local/share/namada/<InSERT CHAIN-ID>/vp_wasm_cache
+StandardOutput=syslog
+StandardError=syslog
 Restart=always
-RestartSec=5s
+RestartSec=10
 LimitNOFILE=65535
-
+LimitSTACK=infinity
 [Install]
 WantedBy=multi-user.target" > $HOME/namadad.service
 sudo mv $HOME/namadad.service /etc/systemd/system
