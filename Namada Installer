@@ -116,8 +116,8 @@ User=$USER
 WorkingDirectory=/home/$USER/.cargo/bin
 Environment=CMT_LOG_LEVEL=p2p:none,pex:error
 Environment=NAMADA_CMT_STDOUT=true
-ExecStart=/home/whispernode/.cargo/bin/namada node ledger run
-ExecStartPre=-/usr/bin/rm -rf /home/$USER/.local/share/namada/<InSERT CHAIN-ID>/tx_wasm_cache /home/$USER/.local/share/namada/<InSERT CHAIN-ID>/vp_wasm_cache
+ExecStart=/home/$USER/.cargo/bin/namada node ledger run
+ExecStartPre=-/usr/bin/rm -rf /home/$USER/.local/share/namada/$NAMADA_CHAIN_ID/tx_wasm_cache /home/$USER/.local/share/namada/$NAMADA_CHAIN_ID/vp_wasm_cache
 StandardOutput=syslog
 StandardError=syslog
 Restart=always
