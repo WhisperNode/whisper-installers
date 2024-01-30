@@ -32,24 +32,15 @@ else
     echo ""
 fi
 
-NAMADA_TAG="v0.30.3"
-NAMADA_CHAIN_ID="<INSERT CHAIN-ID"
-rm -rf $HOME/.masp-params
+# Ask the user for input
+read -p "Enter User: " USER
+read -p "Enter NAMADA_TAG (e.g., v0.30.3): " NAMADA_TAG
+read -p "Enter NAMADA_CHAIN_ID: " NAMADA_CHAIN_ID
 
-if [ ! $USER ]; then
-    read -p "Enter User: " USER
-    echo 'export USER='\"${USER}\" >> "$PROFILE_FILE"
-fi
-
-if [ ! $VALIDATOR_ALIAS ]; then
-    read -p "Enter validator name: " VALIDATOR_ALIAS
-    echo 'export VALIDATOR_ALIAS='\"${VALIDATOR_ALIAS}\" >> "$PROFILE_FILE"
-fi
-
-if [ ! $EMAIL ]; then
-    read -p "Enter your email address: " EMAIL
-    echo 'export EMAIL='\"${EMAIL}\" >> "$PROFILE_FILE"
-fi
+# Update the profile file with user input
+echo 'export USER='\"${USER}\" >> "$PROFILE_FILE"
+echo 'export NAMADA_TAG='\"${NAMADA_TAG}\" >> "$PROFILE_FILE"
+echo 'export NAMADA_CHAIN_ID='\"${NAMADA_CHAIN_ID}\" >> "$PROFILE_FILE"
 
 sleep 1
 
@@ -142,7 +133,8 @@ if [[ `service namadad status | grep active` =~ "running" ]]; then
     echo -e "You can check node status by the command \e[7mservice namadad status\e[0m"
     echo -e "Press \e[7mQ\e[0m for exit from status menu"
 else
-        echo -e "Your namada node \e[31mwas not installed correctly\e[39m, please reinstall."
+    echo -e "Your namada node \e[31mwas not installed correctly\e[39m, please reinstall."
 fi
 
 sudo journalctl -fu namadad
+
