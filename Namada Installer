@@ -94,8 +94,8 @@ git clone https://github.com/anoma/namada
 cd namada
 git checkout $NAMADA_TAG
 make build-release
-sudo mv target/release/namada /usr/local/bin/
-sudo mv target/release/namada[c,n,w] /usr/local/bin/
+sudo mv target/release/namada /home/$USER/.cargo/bin
+sudo mv target/release/namada[c,n,w] /home/$USER/.cargo/bin
 cd $HOME
 namada client utils join-network --chain-id $NAMADA_CHAIN_ID
 sleep 3
