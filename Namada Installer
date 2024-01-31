@@ -95,9 +95,3 @@ wget "$latest_release_url"
 tar -xzvf namada-v0.31.0-Linux-x86_64.tar.gz
 cd namada-v0.31.0-Linux-x86_64
 sudo cp namada* /home/$USER/.cargo/bin/
-
-sleep 5
-
-cd $HOME
-echo "Value of NAMADA_CHAIN_ID: $NAMADA_CHAIN_ID"
-/home/$USER/.cargo/bin/namadac utils join-network --chain-id $NAMADA_CHAIN_ID 
