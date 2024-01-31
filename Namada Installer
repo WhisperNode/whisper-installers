@@ -97,10 +97,10 @@ make build-release
 sudo mv target/release/namada /home/$USER/.cargo/bin
 sudo mv target/release/namada[c,n,w] /home/$USER/.cargo/bin
 cd $HOME
-namada client utils join-network --chain-id $NAMADA_CHAIN_ID
+namada client utils join-network --chain-id $NAMADA_CHAIN_ID --pre-genesis
 sleep 3
 echo "[Unit]
-Description=namada
+Description=namadad
 After=network-online.target
 [Service]
 User=$USER
