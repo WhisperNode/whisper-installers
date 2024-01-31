@@ -34,6 +34,7 @@ fi
 
 # Ask the user for input
 read -p "Enter User: " USER
+read -p "Enter Operating System (e.g. Linux, Darwin): " OPERATING_SYSTEM
 read -p "Enter NAMADA_TAG (e.g., v0.30.3): " NAMADA_TAG
 read -p "Enter NAMADA_CHAIN_ID: " NAMADA_CHAIN_ID
 
@@ -89,13 +90,12 @@ sudo chmod +x cometbft
 sudo mv ./cometbft /usr/local/bin/
 
 cd $HOME
-rm -rf namada
-git clone https://github.com/anoma/namada
-cd namada
-git checkout $NAMADA_TAG
-make build-release
-sudo mv target/release/namada /home/$USER/.cargo/bin
-sudo mv target/release/namada[c,n,w] /home/$USER/.cargo/bin
+latest_release_url=$(curl -s "https://api.github.com/repos/anoma/namada/releases/latest" | grep "browser_download_url" | cut -d '"' -f 4 | grep "$OPERATING_SYSTEM")
+wget "$latest_release_url"
+tar -xzvf namada-v0.31.0-Linux-x86_64.tar.gz
+cd namada-v0.31.0-Linux-x86_64
+sudo cp namada* /home/$USER/.cargo/bin/
+
 cd $HOME
 namada client utils join-network --chain-id $NAMADA_CHAIN_ID --pre-genesis
 sleep 3
