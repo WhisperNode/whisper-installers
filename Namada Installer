@@ -97,7 +97,7 @@ cd namada-v0.31.0-Linux-x86_64
 sudo cp namada* /home/$USER/.cargo/bin/
 
 cd $HOME
-namada client utils join-network --chain-id $NAMADA_CHAIN_ID --pre-genesis
+namada client utils join-network --chain-id $NAMADA_CHAIN_ID 
 sleep 3
 echo "[Unit]
 Description=namadad
